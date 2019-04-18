@@ -184,6 +184,7 @@ int main(int argc, char *argv[])
 			menu_old = menu_sel;
 		}
 
+		ioctl(fb_fd, FBIOPUT_VSCREENINFO, &fb_vi);
 		usleep(100000);		/* 1/10 second */
 	}
 
