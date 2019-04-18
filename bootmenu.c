@@ -33,6 +33,14 @@
 
 void alarm_handler(int sig) { fprintf(stderr, "watchdog expired, booting fallback\n"); exit(1); }
 
+void fb_blank(int fd, int blank)
+{
+    int ret;
+    ret = ioctl(fd, FBIOBLANK, blank ? FB_BLANK_POWERDOWN : FB_BLANK_UNBLANK);
+    if (ret < 0)
+        fprintf(stderr, "ioctl(): blank\n");
+}
+
 int main(int argc, char *argv[])
 {
 	int				ret;
@@ -81,16 +89,21 @@ int main(int argc, char *argv[])
 	memset(&fb_fi, 0, sizeof(fb_fi));
 	fb_fd = open("/dev/graphics/fb0", O_RDWR);
 	ioctl(fb_fd, FBIOGET_VSCREENINFO, &fb_vi);
-	xres = fb_vi.xres;  yres = fb_vi.yres;
 	fb_vi.activate       = FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
-	fb_vi.bits_per_pixel = 32;
+	fb_vi.bits_per_pixel = BPP * 8;
+
 	ioctl(fb_fd, FBIOPUT_VSCREENINFO, &fb_vi);
 	ioctl(fb_fd, FBIOGET_FSCREENINFO, &fb_fi);
+
+	xres = fb_vi.xres;  yres = fb_vi.yres;
 	fprintf(stderr, "fb: smem_len=%d, bpp=%d, xres=%d, yres=%d\n",
 		fb_fi.smem_len, fb_vi.bits_per_pixel, xres, yres);
 	if (fb_fi.smem_len >= 1)
 		fb_map_buf = mmap(NULL, fb_fi.smem_len,
 				  PROT_READ|PROT_WRITE, MAP_SHARED, fb_fd, 0);
+
+	fb_blank(fb_fd, TRUE);
+	fb_blank(fb_fd, FALSE);
 
 	/*
 	** Attempt filesystem mounts.  We use fork()/exec() so that we keep
