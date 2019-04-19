@@ -43,7 +43,7 @@ void fb_blank(int fd, int blank)
 
 int main(int argc, char *argv[])
 {
-	int				ret;
+	int				ret = 0;
 	int				x, y;
 	int				xres, yres;
 	int				countdown = 4/*sec*/ * 10;
@@ -54,8 +54,7 @@ int main(int argc, char *argv[])
 	struct fb_fix_screeninfo	fb_fi;
 	struct fb_var_screeninfo	fb_vi;
 	char				*fb_map_buf;
-	static char			fb_tmp1_buf[BPP * 3840 * 2160],
-					fb_tmp2_buf[BPP * 3840 * 2160];
+	char				*fb_tmp2_buf;
 	char				*img_pname = "", *img2_pname = "";
 
 	fprintf(stderr, "bootmenu startup\n");
@@ -124,6 +123,13 @@ int main(int argc, char *argv[])
 	if (argc >= 2)				/* config file */
 		read_config(argv[1], &menu_sel, &countdown);
 
+	fb_tmp2_buf = malloc(FB_SIZE);
+	if (!fb_tmp2_buf) {
+		fprintf(stderr, "Failed to allocate fb_tmp2_buf\n");
+		ret = -1;
+		goto err_fb_tmp2_buf;
+	}
+
 	/*
 	** Watch for events over the next few seconds.  Redraw upon click.
 	*/
@@ -146,7 +152,7 @@ int main(int argc, char *argv[])
 			if (menu_sel > MAX_MENU_SEL)
 				menu_sel = 1;
 
-			memcpy(fb_tmp2_buf, fb_tmp1_buf, FB_SIZE);
+			memset(fb_tmp2_buf, 0, FB_SIZE);
 
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
 				 6, xres / 200, FALSE,
@@ -261,6 +267,8 @@ int main(int argc, char *argv[])
 	}
 
 	sleep(1);
+	free(fb_tmp2_buf);
+err_fb_tmp2_buf:
 	free(fontmap);
 	if (fb_fi.smem_len >= 1)
 		munmap(fb_map_buf, fb_fi.smem_len);
