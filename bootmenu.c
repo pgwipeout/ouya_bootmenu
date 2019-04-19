@@ -237,7 +237,8 @@ int main(int argc, char *argv[])
 			char *arg[] = {"/sbin/sh", "-c",
 				"kexec --load-hardboot /tmp/zImage"
 				" --initrd /tmp/initramfs.cpio.gz"
-				" --mem-min=0x8E000000"
+				" --mem-min=0x84000000"
+				" --mem-max=0x90000000"
 				" --command-line=\"$(cat /tmp/cmdline"
 						      " /proc/cmdline)\" ; "
 				"kexec -e", NULL};
