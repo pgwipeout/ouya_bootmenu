@@ -21,7 +21,7 @@
 #define FALSE		(0)
 #define TRUE		(1)
 
-#define MAX_MENU_SEL	(5)
+#define MAX_MENU_SEL	(6)
 
 #define BPP		(32 / 8)		/* bytes/pixel for 32 bpp */
 #define FB_SIZE		(BPP * xres * yres)
@@ -166,22 +166,25 @@ int main(int argc, char *argv[])
 				"Normal Boot");
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
 				 10, xres / 200, (menu_sel==2),
-				"Alternate Boot");
+				"Alternate Boot on /system");
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
 				 11, xres / 200, (menu_sel==3),
+				"Alternate Boot on /data");
+			write_text(fb_tmp2_buf, xres, yres, fontmap,
+				 12, xres / 200, (menu_sel==4),
 				"Recovery");
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
-				 13, xres / 200, (menu_sel==4),
+				 14, xres / 200, (menu_sel==5),
 				"Bootloader");
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
-				 14, xres / 200, (menu_sel==5),
+				 15, xres / 200, (menu_sel==6),
 				"Failsafe");
 
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
-				 19, xres / 200, FALSE,
+				 20, xres / 200, FALSE,
 				"POWER moves to next item");
 			write_text(fb_tmp2_buf, xres, yres, fontmap,
-				 20, xres / 200, FALSE,
+				 21, xres / 200, FALSE,
 				"Wait two seconds to select");
 
 			if (fb_fi.smem_len >= 1)
@@ -202,10 +205,13 @@ int main(int argc, char *argv[])
 			img_pname = "/tmp/m_system/boot.img";
 			break;
 		case 2:
+			img_pname = "/tmp/m_system/altboot.img";
+			break;
+		case 3:
 			img_pname = "/tmp/m_data/media/altboot.img";
 			img2_pname = "/tmp/m_data/media/0/altboot.img";
 			break;
-		case 3:
+		case 4:
 			fprintf(stderr, "reboot recovery\n");
 			sync();
 			if (fork() == 0)  {
@@ -217,7 +223,7 @@ int main(int argc, char *argv[])
 
 			sleep(2);
 			break;
-		case 4:
+		case 5:
 			fprintf(stderr, "reboot bootloader\n");
 			sync();
 			if (fork() == 0)  {
@@ -229,7 +235,7 @@ int main(int argc, char *argv[])
 
 			sleep(2);
 			break;
-		case 5:
+		case 6:
 			fprintf(stderr, "failsafe exit (to CWM)\n");
 			break;
 	}
