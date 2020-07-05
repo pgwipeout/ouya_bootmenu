@@ -26,7 +26,7 @@
 #define BPP		(32 / 8)		/* bytes/pixel for 32 bpp */
 #define FB_SIZE		(BPP * xres * yres)
 
-#define MAX_IMG_SIZE	(8 * 1024 * 1024)	/* Android kernel file */
+#define MAX_IMG_SIZE	(8 * 1024 * 1024 * 16)	/* Android kernel file */
 
 #define MOUNT_PATH	"/dev/block/platform/sdhci-tegra.3/by-name"
 
